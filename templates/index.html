@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rice Leaf Disease Classifier</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <span class="logo">🌾</span>
+                <span class="brand-name">Rice Disease AI</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="#home" class="active">Home</a></li>
+                <li><a href="#features">Features</a></li>
+                <li><a href="#classifier">Classifier</a></li>
+                <li><a href="#about">About</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="hero-content">
+            <div class="hero-text">
+                <h1 class="hero-title">
+                    Protect Your Rice Crops with
+                    <span class="gradient-text">AI Technology</span>
+                </h1>
+                <p class="hero-description">
+                    Advanced deep learning model powered by ResNet18 to detect rice leaf diseases instantly. 
+                    Upload an image and get accurate diagnosis with treatment recommendations.
+                </p>
+                <div class="hero-buttons">
+                    <a href="#classifier" class="btn btn-primary">Try Classifier</a>
+                    <a href="#features" class="btn btn-secondary">Learn More</a>
+                </div>
+                <div class="hero-stats">
+                    <div class="stat-item">
+                        <span class="stat-number">95%+</span>
+                        <span class="stat-label">Accuracy</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">3</span>
+                        <span class="stat-label">Disease Types</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">&lt;2s</span>
+                        <span class="stat-label">Prediction Time</span>
+                    </div>
+                </div>
+            </div>
+            <div class="hero-image">
+                <div class="floating-card card-1">
+                    <img src="https://images.unsplash.com/photo-1574943320219-553eb213f72d?w=400" alt="Rice field">
+                </div>
+                <div class="floating-card card-2">
+                    <img src="https://images.unsplash.com/photo-1560493676-04071c5f467b?w=400" alt="Rice plant">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="features">
+        <div class="container">
+            <h2 class="section-title">Powerful Features</h2>
+            <p class="section-subtitle">Everything you need for accurate disease detection</p>
+            
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🔬</div>
+                    <h3>AI-Powered Detection</h3>
+                    <p>Advanced ResNet18 architecture trained on thousands of rice leaf images for accurate disease identification.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <h3>Instant Results</h3>
+                    <p>Get predictions in under 2 seconds with confidence scores and detailed probability breakdowns.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">💊</div>
+                    <h3>Treatment Guidance</h3>
+                    <p>Receive specific treatment recommendations and preventive measures for detected diseases.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h3>Detailed Analysis</h3>
+                    <p>View comprehensive disease information including symptoms, severity levels, and causes.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🌍</div>
+                    <h3>Easy to Use</h3>
+                    <p>Simple drag-and-drop interface works on any device. No technical knowledge required.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🔒</div>
+                    <h3>Privacy First</h3>
+                    <p>Your images are processed securely and never stored on our servers.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Classifier Section -->
+    <section id="classifier" class="classifier">
+        <div class="container">
+            <h2 class="section-title">Disease Classifier</h2>
+            <p class="section-subtitle">Upload a rice leaf image to get instant diagnosis</p>
+            
+            <div class="classifier-container">
+                <div class="upload-section">
+                    <div class="upload-area" id="uploadArea">
+                        <div class="upload-content">
+                            <div class="upload-icon">📸</div>
+                            <h3>Drop your image here</h3>
+                            <p>or click to browse</p>
+                            <input type="file" id="imageInput" accept="image/*" hidden>
+                            <button class="btn btn-primary" id="browseBtn">Browse Files</button>
+                        </div>
+                    </div>
+                    
+                    <div class="image-preview" id="imagePreview" style="display: none;">
+                        <img id="previewImg" src="" alt="Preview">
+                        <button class="btn-remove" id="removeBtn">✕</button>
+                    </div>
+                    
+                    <button class="btn btn-success btn-large" id="predictBtn" style="display: none;">
+                        Analyze Image
+                    </button>
+                </div>
+                
+                <div class="results-section" id="resultsSection" style="display: none;">
+                    <div class="result-card">
+                        <h3>Prediction Results</h3>
+                        
+                        <div class="prediction-main">
+                            <div class="disease-name" id="diseaseName"></div>
+                            <div class="confidence-badge" id="confidenceBadge"></div>
+                        </div>
+                        
+                        <div class="probabilities" id="probabilities"></div>
+                        
+                        <div class="disease-details">
+                            <div class="detail-section">
+                                <h4>📋 Description</h4>
+                                <p id="diseaseDescription"></p>
+                            </div>
+                            
+                            <div class="detail-section">
+                                <h4>🔍 Symptoms</h4>
+                                <ul id="diseaseSymptoms"></ul>
+                            </div>
+                            
+                            <div class="detail-section">
+                                <h4>💊 Treatment</h4>
+                                <ul id="diseaseTreatment"></ul>
+                            </div>
+                            
+                            <div class="severity-badge" id="severityBadge"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="about">
+        <div class="container">
+            <h2 class="section-title">About the Project</h2>
+            <div class="about-content">
+                <div class="about-text">
+                    <h3>Transfer Learning with ResNet18</h3>
+                    <p>
+                        This project uses state-of-the-art deep learning techniques to identify rice leaf diseases. 
+                        Built on the ResNet18 architecture pre-trained on ImageNet, the model has been fine-tuned 
+                        specifically for rice disease classification.
+                    </p>
+                    
+                    <h3>Detected Diseases</h3>
+                    <ul class="disease-list">
+                        <li><strong>Bacterial Leaf Blight:</strong> Serious bacterial infection causing wilting</li>
+                        <li><strong>Brown Spot:</strong> Fungal disease with characteristic brown lesions</li>
+                        <li><strong>Leaf Smut:</strong> Fungal infection producing black spore masses</li>
+                    </ul>
+                    
+                    <h3>Technology Stack</h3>
+                    <div class="tech-stack">
+                        <span class="tech-badge">PyTorch</span>
+                        <span class="tech-badge">ResNet18</span>
+                        <span class="tech-badge">Flask</span>
+                        <span class="tech-badge">Transfer Learning</span>
+                        <span class="tech-badge">Computer Vision</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; Rice Disease Detection by Anurag Pandey, Kanika Bhardwaj, Tulip Sharma and Harsh Chaudhary.</p>
+        </div>
+    </footer>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loader"></div>
+        <p>Analyzing image...</p>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
