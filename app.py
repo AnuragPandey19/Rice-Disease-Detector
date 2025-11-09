@@ -1,20 +1,10 @@
-"""
-Flask Backend for Rice Leaf Disease Classification
-File: app.py
-"""
-
-from flask import Flask, render_template, request, jsonify
-import os
+import gradio as gr
 import torch
 import torch.nn as nn
 import torchvision.transforms as transforms
 import torchvision.models as models
 from PIL import Image
-import io
-import base64
-
-app = Flask(__name__)
-app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
+import os
 
 # Configuration
 DISEASE_TYPES = ['Bacterial leaf blight', 'Brown spot', 'Leaf smut']
@@ -53,7 +43,7 @@ class DiseaseClassifier:
         
     def load_model(self, model_path, num_classes):
         """Load the trained model"""
-        network = models.resnet18(pretrained=False)
+        network = models.resnet18(weights=None)
         feature_count = network.fc.in_features
         network.fc = nn.Sequential(
             nn.Dropout(0.5),
@@ -64,7 +54,7 @@ class DiseaseClassifier:
         )
         
         if os.path.exists(model_path):
-            network.load_state_dict(torch.load(model_path, map_location=processing_unit))
+            network.load_state_dict(torch.load(model_path, map_location=processing_unit, weights_only=True))
             network = network.to(processing_unit)
             network.eval()
             print(f"Model loaded successfully from {model_path}")
@@ -103,61 +93,63 @@ class DiseaseClassifier:
         # Get all class probabilities
         all_probs = probabilities[0].cpu().numpy()
         
-        return {
-            'disease': DISEASE_TYPES[predicted_idx],
-            'confidence': round(confidence_score, 2),
-            'probabilities': {DISEASE_TYPES[i]: round(float(all_probs[i]) * 100, 2) 
-                            for i in range(len(DISEASE_TYPES))}
-        }
+        disease_name = DISEASE_TYPES[predicted_idx]
+        disease_details = DISEASE_INFO.get(disease_name, {})
+        
+        # Format output
+        result_text = f"""
+## 🔍 Prediction Results
+
+**Disease Detected:** {disease_name}  
+**Confidence:** {confidence_score:.2f}%
+
+### 📊 All Probabilities:
+"""
+        for i, disease in enumerate(DISEASE_TYPES):
+            result_text += f"- **{disease}:** {all_probs[i]*100:.2f}%\n"
+        
+        result_text += f"""
+### 📋 Disease Information
+
+**Description:** {disease_details.get('description', 'N/A')}
+
+**Severity:** {disease_details.get('severity', 'N/A')}
+
+**Symptoms:**
+"""
+        for symptom in disease_details.get('symptoms', []):
+            result_text += f"- {symptom}\n"
+        
+        result_text += "\n**Treatment:**\n"
+        for treatment in disease_details.get('treatment', []):
+            result_text += f"- {treatment}\n"
+        
+        return result_text
 
 # Initialize classifier
 classifier = DiseaseClassifier(MODEL_PATH, len(DISEASE_TYPES))
 
-@app.route('/')
-def home():
-    """Render home page"""
-    return render_template('index.html')
-
-@app.route('/predict', methods=['POST'])
-def predict():
-    """Handle prediction request"""
-    try:
-        if 'image' not in request.files:
-            return jsonify({'error': 'No image uploaded'}), 400
-        
-        file = request.files['image']
-        
-        if file.filename == '':
-            return jsonify({'error': 'No image selected'}), 400
-        
-        # Read and process image
-        image_bytes = file.read()
-        image = Image.open(io.BytesIO(image_bytes))
-        
-        # Make prediction
-        result = classifier.predict(image)
-        
-        # Get disease information
-        disease_name = result['disease']
-        disease_details = DISEASE_INFO.get(disease_name, {})
-        
-        # Combine results
-        response = {
-            'success': True,
-            'prediction': result,
-            'disease_info': disease_details
-        }
-        
-        return jsonify(response)
+def predict_disease(image):
+    """Gradio prediction function"""
+    if image is None:
+        return "Please upload an image first."
     
+    try:
+        result = classifier.predict(image)
+        return result
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        return f"Error: {str(e)}"
 
-@app.route('/about')
-def about():
-    """Render about page"""
-    return render_template('about.html')
+# Create Gradio interface
+demo = gr.Interface(
+    fn=predict_disease,
+    inputs=gr.Image(type="pil", label="Upload Rice Leaf Image"),
+    outputs=gr.Markdown(label="Prediction Results"),
+    title="🌾 Rice Leaf Disease Detection",
+    description="Upload an image of a rice leaf to detect diseases: Bacterial leaf blight, Brown spot, or Leaf smut.",
+    examples=[],
+    theme="soft"
+)
 
-if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5000))
-    app.run(debug=False, host='0.0.0.0', port=port)
+if __name__ == "__main__":
+    demo.launch()
