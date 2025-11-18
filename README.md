@@ -16,50 +16,41 @@
 
 ---
 
-## 📸 Application Preview
+## 🎬 How It Works
 
 <div align="center">
-
-### 🎬 How It Works
 
 ```
 📷 Upload Image → 🧠 AI Analysis → 🔬 Disease Detection → 💡 Treatment Advice
      (< 1 sec)        (< 2 sec)         (98.2% accurate)      (Instant)
 ```
 
-### 🖥️ Web Interface
-
-![Application Screenshot](https://via.placeholder.com/900x500/10b981/ffffff?text=Upload+→+Analyze+→+Get+Results)
-
-*Modern, intuitive interface with drag-and-drop functionality*
-
-### 🎯 Detection in Action
+### 🎯 Three Simple Steps
 
 <table>
 <tr>
 <td width="33%" align="center">
-  <img src="https://via.placeholder.com/250x250/3b82f6/ffffff?text=1.+Upload+Leaf" alt="Step 1"/>
+  <h3>📤</h3>
+  <b>Upload</b>
   <br/>
-  <b>📤 Upload</b>
-  <br/>
-  <sub>Drag & drop or click</sub>
+  <sub>Drag & drop or click to upload rice leaf image</sub>
 </td>
 <td width="33%" align="center">
-  <img src="https://via.placeholder.com/250x250/8b5cf6/ffffff?text=2.+AI+Analysis" alt="Step 2"/>
+  <h3>🧠</h3>
+  <b>Analyze</b>
   <br/>
-  <b>🧠 Analyze</b>
-  <br/>
-  <sub>5-model ensemble</sub>
+  <sub>5-model ensemble processes your image</sub>
 </td>
 <td width="33%" align="center">
-  <img src="https://via.placeholder.com/250x250/10b981/ffffff?text=3.+Get+Results" alt="Step 3"/>
+  <h3>✅</h3>
+  <b>Results</b>
   <br/>
-  <b>✅ Results</b>
-  <br/>
-  <sub>Disease + treatment</sub>
+  <sub>Get disease diagnosis + treatment advice</sub>
 </td>
 </tr>
 </table>
+
+> 💡 **Tip:** Visit the [live demo](https://undebuggedbit-Rice-Leaf-Disease-Detector.hf.space/) to see it in action!
 
 </div>
 
