@@ -1,0 +1,6 @@
+Flask==3.0.0
+flask-cors
+torch==2.5.1
+torchvision==0.20.1
+Pillow==10.0.0
+gunicorn==21.2.0

@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌾 Rice Leaf Disease Detection - AI-Powered Diagnosis</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Background Animation -->
+    <div class="background-animation"></div>
+    
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <span class="logo-icon">🌾</span>
+                <span class="logo-text">Rice Leaf AI</span>
+            </div>
+            <nav class="nav">
+                <a href="#home" class="nav-link active">Home</a>
+                <a href="#about" class="nav-link">About</a>
+                <a href="#how-it-works" class="nav-link">How It Works</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Hero Section -->
+            <section class="hero" id="home">
+                <div class="hero-content">
+                    <h1 class="hero-title">
+                        AI-Powered Rice Leaf
+                        <span class="gradient-text">Disease Detection</span>
+                    </h1>
+                    <p class="hero-subtitle">
+                        Upload an image of a rice leaf and get instant, accurate disease diagnosis using advanced deep learning models.
+                    </p>
+                    <div class="hero-stats">
+                        <div class="stat">
+                            <div class="stat-value">98.2%</div>
+                            <div class="stat-label">Accuracy</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-value">5</div>
+                            <div class="stat-label">AI Models</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-value">&lt;2s</div>
+                            <div class="stat-label">Detection Time</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Upload Section -->
+            <section class="upload-section">
+                <div class="upload-card">
+                    <div class="upload-header">
+                        <h2>Upload Rice Leaf Image</h2>
+                        <p>Drag & drop, browse, or use camera</p>
+                    </div>
+                    
+                    <div class="upload-area" id="uploadArea">
+                        <input type="file" id="fileInput" accept="image/*" hidden>
+                        <div class="upload-content" id="uploadContent">
+                            <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+                            </svg>
+                            <p class="upload-text">Drop your image here or <span class="upload-link">browse</span></p>
+                            <p class="upload-hint">Supports: JPG, PNG, JPEG (Max 10MB)</p>
+                            
+                            <!-- Camera Button -->
+                            <button class="camera-button" id="cameraButton" type="button">
+                                <svg class="camera-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                                    <circle cx="12" cy="13" r="4"></circle>
+                                </svg>
+                                <span>Use Camera</span>
+                            </button>
+                        </div>
+                        <div class="image-preview" id="imagePreview" style="display: none;">
+                            <img id="previewImage" alt="Preview">
+                            <button class="remove-image" id="removeImage">✕</button>
+                        </div>
+                    </div>
+                    
+                    <button class="analyze-button" id="analyzeButton" disabled>
+                        <span class="button-text">Analyze Image</span>
+                        <svg class="button-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M5 12h14M12 5l7 7-7 7"/>
+                        </svg>
+                    </button>
+                </div>
+            </section>
+
+            <!-- Camera Modal -->
+            <div class="camera-modal" id="cameraModal" style="display: none;">
+                <div class="camera-modal-content">
+                    <div class="camera-header">
+                        <h3>Take Photo</h3>
+                        <button class="close-camera" id="closeCameraBtn">✕</button>
+                    </div>
+                    <div class="camera-container">
+                        <video id="cameraVideo" autoplay playsinline></video>
+                        <canvas id="cameraCanvas" style="display: none;"></canvas>
+                    </div>
+                    <div class="camera-controls">
+                        <button class="camera-control-btn" id="switchCameraBtn" title="Switch Camera">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M17 1l4 4-4 4"></path>
+                                <path d="M3 11V9a4 4 0 0 1 4-4h14"></path>
+                                <path d="M7 23l-4-4 4-4"></path>
+                                <path d="M21 13v2a4 4 0 0 1-4 4H3"></path>
+                            </svg>
+                        </button>
+                        <button class="capture-btn" id="captureBtn">
+                            <div class="capture-btn-inner"></div>
+                        </button>
+                        <button class="camera-control-btn" id="cancelCameraBtn" title="Cancel">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Loading Overlay -->
+            <div class="loading-overlay" id="loadingOverlay" style="display: none;">
+                <div class="loading-content">
+                    <div class="loading-spinner"></div>
+                    <p class="loading-text">Analyzing image...</p>
+                    <p class="loading-subtext">Processing with AI models</p>
+                </div>
+            </div>
+
+            <!-- Results Section -->
+            <section class="results-section" id="resultsSection" style="display: none;">
+                <div class="results-card">
+                    <div class="results-header">
+                        <h2>Analysis Results</h2>
+                        <button class="close-results" id="closeResults">✕</button>
+                    </div>
+                    
+                    <div class="diagnosis-banner" id="diagnosisBanner">
+                        <div class="diagnosis-icon" id="diagnosisIcon">🌿</div>
+                        <div class="diagnosis-content">
+                            <h3 class="diagnosis-title" id="diagnosisTitle">Diagnosis</h3>
+                            <div class="confidence-badge" id="confidenceBadge">
+                                <span class="confidence-label">Confidence:</span>
+                                <span class="confidence-value" id="confidenceValue">0%</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="severity-indicator" id="severityIndicator">
+                        <span class="severity-label">Severity:</span>
+                        <span class="severity-badge" id="severityBadge">Unknown</span>
+                    </div>
+                    
+                    <div class="result-details">
+                        <div class="detail-section">
+                            <h4>📋 Description</h4>
+                            <p id="descriptionText">No description available</p>
+                        </div>
+                        
+                        <div class="detail-section">
+                            <h4>💡 Recommendation</h4>
+                            <p id="recommendationText">No recommendations available</p>
+                        </div>
+                        
+                        <div class="detail-section technical-details">
+                            <h4>🔬 Technical Details</h4>
+                            <div class="tech-grid">
+                                <div class="tech-item">
+                                    <span class="tech-label">Stage 1 Prediction:</span>
+                                    <span class="tech-value" id="stage1Pred">-</span>
+                                </div>
+                                <div class="tech-item">
+                                    <span class="tech-label">Stage 1 Confidence:</span>
+                                    <span class="tech-value" id="stage1Conf">-</span>
+                                </div>
+                                <div class="tech-item">
+                                    <span class="tech-label">Stage 2 Used:</span>
+                                    <span class="tech-value" id="stage2Used">-</span>
+                                </div>
+                                <div class="tech-item">
+                                    <span class="tech-label">Models Used:</span>
+                                    <span class="tech-value" id="modelsUsed">-</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button class="analyze-another" id="analyzeAnother">
+                        Analyze Another Image
+                    </button>
+                </div>
+            </section>
+
+            <!-- How It Works Section -->
+            <section class="how-it-works" id="how-it-works">
+                <h2 class="section-title">How It Works</h2>
+                <div class="steps-grid">
+                    <div class="step-card">
+                        <div class="step-number">1</div>
+                        <h3>Upload Image</h3>
+                        <p>Upload a clear photo of a rice leaf</p>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-number">2</div>
+                        <h3>AI Analysis</h3>
+                        <p>5 AI models analyze the leaf in 2 stages</p>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-number">3</div>
+                        <h3>Get Results</h3>
+                        <p>Receive diagnosis with recommendations</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- About Section -->
+            <section class="about-section" id="about">
+                <div class="about-content">
+                    <h2 class="section-title">About This System</h2>
+                    <p class="about-text">
+                        This AI-powered system uses a two-stage ensemble approach with 5 deep learning models 
+                        to accurately detect rice leaf diseases. It can identify healthy leaves, non-rice leaves, 
+                        and 5 different bacterial diseases with 98.2% accuracy.
+                    </p>
+                    <div class="features-grid">
+                        <div class="feature">
+                            <div class="feature-icon">🎯</div>
+                            <h3>High Accuracy</h3>
+                            <p>98.2% detection accuracy</p>
+                        </div>
+                        <div class="feature">
+                            <div class="feature-icon">⚡</div>
+                            <h3>Fast Processing</h3>
+                            <p>Results in under 2 seconds</p>
+                        </div>
+                        <div class="feature">
+                            <div class="feature-icon">🧠</div>
+                            <h3>Smart System</h3>
+                            <p>2-stage verification process</p>
+                        </div>
+                        <div class="feature">
+                            <div class="feature-icon">📱</div>
+                            <h3>Easy to Use</h3>
+                            <p>Simple drag & drop interface</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 Rice Leaf Disease Detection. Powered by Deep Learning.</p>
+            <p class="footer-tech">Built with PyTorch, Flask & Modern AI</p>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

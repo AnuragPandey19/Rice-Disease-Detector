@@ -1,0 +1,31 @@
+{
+    "stage1_classes": [
+        "bacterial_leaf_blight",
+        "brown_spot",
+        "healthy",
+        "leaf_blast",
+        "leaf_scald",
+        "narrow_brown_spot",
+        "not_rice_leaf"
+    ],
+    "stage2_classes": [
+        "bacterial_leaf_blight",
+        "brown_spot",
+        "leaf_blast",
+        "leaf_scald",
+        "narrow_brown_spot"
+    ],
+    "stage1_model_paths": {
+        "efficientnet_b3": "saved_models/stage1_models\\efficientnet_b3_20251115_223929.pth",
+        "densenet121": "saved_models/stage1_models\\densenet121_20251115_232719.pth",
+        "mobilenetv3": "saved_models/stage1_models\\mobilenetv3_20251115_235253.pth"
+    },
+    "stage2_model_paths": {
+        "vit_base": "saved_models/stage2_models\\vit_base_20251116_002651.pth",
+        "convnext_tiny": "saved_models/stage2_models\\convnext_tiny_20251116_004720.pth",
+        "efficientnetv2_s": "saved_models/stage2_models\\efficientnetv2_s_20251116_013740.pth"
+    },
+    "img_size": 224,
+    "confidence_threshold": 0.95,
+    "timestamp": "20251116_014349"
+}
