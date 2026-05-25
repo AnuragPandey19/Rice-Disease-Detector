@@ -5,7 +5,7 @@ A two-stage deep learning system for detecting rice leaf diseases from images, d
 **Live Demo:** https://undebuggedbit-rice-leaf-disease-detector.hf.space/
 
 [![Python](https://img.shields.io/badge/Python-3.10+-blue.svg)](https://www.python.org/downloads/)
-[![PyTorch](https://img.shields.io/badge/PyTorch-2.1.0-red.svg)](https://pytorch.org/)
+[![PyTorch](https://img.shields.io/badge/PyTorch-2.5.1-red.svg)](https://pytorch.org/)
 [![Flask](https://img.shields.io/badge/Flask-3.0.0-green.svg)](https://flask.palletsprojects.com/)
 [![Hugging Face Spaces](https://img.shields.io/badge/Hugging%20Face-Spaces-yellow.svg)](https://undebuggedbit-rice-leaf-disease-detector.hf.space/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-purple.svg)](LICENSE)
@@ -28,11 +28,11 @@ The model handles 7 output classes:
 
 | Class | Type | Treatment-relevant |
 |---|---|---|
-| Bacterial Leaf Blight | Bacterial | Yes — copper-based bactericides |
-| Brown Spot | Fungal | Yes — fungicide + potassium management |
-| Leaf Blast | Fungal | Yes — tricyclazole-based fungicide |
-| Leaf Scald | Fungal | Yes — resistant varieties + fungicide |
-| Narrow Brown Spot | Fungal | Yes — fungicide application |
+| Bacterial Leaf Blight | Bacterial | Yes — copper-based bactericides, resistant varieties, field drainage |
+| Brown Spot | Fungal | Yes — fungicide application, disease-free seeds, nutrition management |
+| Leaf Blast | Fungal | Yes — resistant varieties, systemic fungicides, reduce nitrogen |
+| Leaf Scald | Fungal | Yes — resistant varieties, remove infected plants, copper bactericides |
+| Narrow Brown Spot | Fungal | Yes — improve soil fertility, targeted fungicide |
 | Healthy Leaf | — | None needed |
 | Not a Rice Leaf | — | Rejects out-of-distribution input |
 
@@ -40,54 +40,68 @@ The model handles 7 output classes:
 
 ## Approach: Two-Stage Ensemble
 
-A single classifier struggled to distinguish visually similar bacterial diseases. I split the problem:
+A single classifier struggled to distinguish visually similar diseases. I split the problem:
 
 **Stage 1 — Broad triage (7-class classification)**
-A 3-model ensemble (EfficientNet-B3, DenseNet-121, MobileNetV3) majority-votes on the disease family. Fast, accurate enough to route most cases directly to a final answer.
+A 3-model ensemble (EfficientNet-B3, DenseNet-121, MobileNetV3-Large) soft-votes (averaged softmax) on the disease label. Fast, accurate enough to route most cases directly to a final answer.
 
-**Stage 2 — Bacterial disease refinement (5-class classification)**
-If Stage 1 flags a bacterial disease, a 2-model ensemble (ViT-Base, ConvNeXt-Tiny) re-classifies among the bacterial subtypes for higher precision. Only invoked when needed, keeping average latency low.
+**Stage 2 — Disease refinement (5-class classification)**
+If Stage 1 predicts any of the 5 disease classes **and** Stage 1 confidence is below 0.95, a 2-model ensemble (ViT-Base + ConvNeXt-Tiny) re-classifies among the 5 disease subtypes for higher precision. Stage 2 is skipped on healthy leaves, off-distribution inputs, and high-confidence disease predictions, keeping average latency low.
 
 ```mermaid
 graph LR
     A[Input Image] --> B[Stage 1: 3-model ensemble]
-    B --> C{Bacterial<br/>disease?}
+    B --> C{Disease<br/>AND conf < 0.95?}
     C -->|Yes| D[Stage 2: 2-model refinement]
     C -->|No| E[Return result]
     D --> E
     E --> F[Diagnosis + treatment]
 ```
 
+Final confidence is computed as `stage1_conf * stage2_conf` (multiplicative) when Stage 2 runs, otherwise just `stage1_conf`.
+
 ### Why ensembles instead of a single bigger model?
 A single ViT-Base achieves comparable accuracy but takes ~3x longer per inference. The ensemble lets me combine a fast first-pass with a precise refinement only on the hard cases, optimizing for average latency, not peak accuracy.
 
 ### What I optimized
-- **Initial design used 6 models. Final design uses 5.** Removing the weakest contributor (a redundant ResNet variant) reduced inference time by ~16% and *improved* combined accuracy by 0.91%, because the dropped model was adding correlated errors rather than diverse predictions.
+- **Initial design used 6 models. Final design uses 5.** Removing the weakest Stage 2 contributor — **EfficientNetV2-S** (94.09% standalone) — reduced inference time by ~16% and *improved* Stage 2 ensemble accuracy by 0.91% (97.27% → 98.18%), because the dropped model was adding correlated errors rather than diverse predictions.
 
 ---
 
 ## Results
 
-| Metric | Stage 1 (7-class) | Stage 2 (5-class) | Combined Pipeline |
-|---|---|---|---|
-| Accuracy | 96.68% | 98.18% | **98.2%** |
-| Precision | 96.5% | 98.3% | **98.1%** |
-| Recall | 96.4% | 98.2% | **98.0%** |
-| F1-Score | 96.4% | 98.2% | **98.1%** |
-| Avg. inference time | 0.8s | 1.1s | **<2s end-to-end** |
+Measured on the validation set (held out by folder, not random split):
 
-Metrics computed on a held-out test set (15% of total data, stratified by class).
+| Metric | Stage 1 (7-class) | Stage 2 (5-class) |
+|---|---|---|
+| Ensemble accuracy | **96.68%** | **98.18%** |
+| Avg. ensemble confidence | 87.71% | 96.12% |
+
+**Per-class accuracy (Stage 2, final 2-model setup):**
+
+| Class | Accuracy |
+|---|---|
+| Bacterial Leaf Blight | 100.00% |
+| Brown Spot | 96.59% |
+| Leaf Blast | 94.32% (+5.68% vs. original 3-model setup) |
+| Leaf Scald | 100.00% |
+| Narrow Brown Spot | 100.00% |
+
+> Note: Latency was not formally benchmarked. The "<2s end-to-end" claim is anecdotal from the Hugging Face Spaces demo on free-tier CPU; results will vary by hardware.
 
 ---
 
 ## Dataset
 
 - **Source:** Public rice leaf disease datasets from Kaggle and the UCI ML Repository, combined and deduplicated.
-- **Total images:** ~5,400 across 7 classes after cleaning.
-- **Splits:** 70% train / 15% validation / 15% test, stratified.
+- **Stage 1 — train:** 2,519 images across 7 classes (350 each of 6 disease/healthy classes; 420 not-a-rice-leaf).
+- **Stage 1 — validation:** 634 images (88 each of 6 classes; 106 not-a-rice-leaf).
+- **Stage 2 — train:** 1,750 disease images (350 × 5 disease classes).
+- **Stage 2 — validation:** 440 disease images (88 × 5).
+- **Split:** Train/validation only (~80/20). No separate held-out test set; reported metrics are validation accuracy.
 - **Preprocessing:** Resize to 224×224, normalize with ImageNet statistics.
-- **Augmentation (train only):** Horizontal flip, rotation (±15°), color jitter, random erasing.
-- **Class imbalance:** Healthy and "Not a rice leaf" classes were under-represented; addressed via weighted sampling during training.
+- **Augmentation (train only):** Horizontal flip, vertical flip, rotation (±30° for Stage 1, ±45° for Stage 2), color jitter, random affine translation/scaling, random perspective.
+- **Class imbalance:** Mild. Stage 1 was trained with **focal loss (α=1, γ=2)** to put weight on harder disease boundaries.
 
 ---
 
@@ -99,15 +113,17 @@ Honest about what this system can and cannot do:
 - **Only 5 disease classes covered.** Real rice cultivation has 20+ diseases, plus nutrient deficiencies and pest damage that can visually resemble disease.
 - **No regional or varietal awareness.** Symptoms can present differently across rice cultivars and climates; this model treats them all as one distribution.
 - **Treatment recommendations are generic.** They do not account for local resistance patterns, organic vs. conventional farming, or regional pesticide regulations.
+- **Confidence calibration not measured.** The 0.95 routing threshold is heuristic, not derived from a reliability diagram.
+- **No held-out test set.** Reported metrics are on the validation set used for model selection; true generalization could be lower.
 - **Not a substitute for an agronomist.** Intended as a triage tool, not a diagnostic authority.
 
 ---
 
 ## Tech Stack
 
-- **Models:** PyTorch (EfficientNet, DenseNet, MobileNet, ViT, ConvNeXt — all initialized from ImageNet weights and fine-tuned)
-- **Backend:** Flask + REST API
-- **Deployment:** Docker container on Hugging Face Spaces
+- **Models:** PyTorch 2.5 (EfficientNet-B3, DenseNet-121, MobileNetV3-Large, ViT-Base, ConvNeXt-Tiny — all initialized from ImageNet weights and fine-tuned with partial-freeze)
+- **Backend:** Flask 3 + Flask-CORS, single Gunicorn worker
+- **Deployment:** Docker container (`python:3.10-slim`) on Hugging Face Spaces
 - **Frontend:** HTML / CSS / vanilla JS with drag-and-drop upload
 
 ---
@@ -122,29 +138,36 @@ curl -X POST \
   https://undebuggedbit-rice-leaf-disease-detector.hf.space/predict
 ```
 
-Response:
+Example response:
 
 ```json
 {
   "success": true,
   "diagnosis": "Bacterial Leaf Blight",
-  "confidence": "98.45%",
+  "confidence": "97.59%",
   "severity": "High",
-  "recommendation": "Use resistant varieties and apply copper-based bactericides.",
+  "description": "A serious bacterial disease causing water-soaked lesions that turn yellow or white.",
+  "recommendation": "Use resistant varieties, apply copper-based bactericides, ensure proper field drainage.",
+  "icon": "🦠",
+  "stage2_used": true,
+  "timestamp": "2025-11-16 10:23:45",
   "details": {
     "stage1_prediction": "Bacterial Leaf Blight",
     "stage1_confidence": "99.12%",
-    "stage2_used": true,
-    "stage2_prediction": "Bacterial Leaf Blight",
-    "stage2_confidence": "98.45%",
-    "processing_time": "1.87s"
+    "stage2_prediction": "bacterial_leaf_blight",
+    "models_used": 5
   }
 }
 ```
 
+`confidence` is the combined (multiplicative) confidence when Stage 2 runs.
+
 ### GET /health
 
-Returns service health and model load status. See `app.py` for the full schema.
+Returns service health and model load status:
+```json
+{ "status": "healthy", "model_loaded": true, "device": "cpu", "timestamp": "..." }
+```
 
 ---
 
@@ -183,18 +206,23 @@ docker run -p 7860:7860 rice-leaf-detection
 
 ```
 .
-├── app.py                       # Flask application + inference pipeline
+├── app.py                       # Flask app + two-stage ensemble inference pipeline
+├── model.ipynb                  # Training notebook (Stage 1 + Stage 2)
 ├── requirements.txt
 ├── Dockerfile
 ├── SETUP_GUIDE.md
 ├── templates/index.html         # Web UI
 ├── static/                      # CSS, JS
+├── train/                       # Stage 1 training images (7 classes)
+├── validation/                  # Stage 1 validation images
+├── train_stage2/                # Stage 2 training images (5 disease classes)
+├── validation_stage2/           # Stage 2 validation images
 ├── saved_models/
-│   ├── stage1_models/           # EfficientNet, DenseNet, MobileNet weights
-│   └── stage2_models/           # ViT, ConvNeXt weights
-├── train/                       # Stage 1 training notebooks
-├── train_stage2/                # Stage 2 training notebooks
-└── validation/                  # Evaluation scripts and confusion matrices
+│   ├── stage1_models/           # EfficientNet, DenseNet, MobileNet weights + confusion matrices
+│   ├── stage2_models/           # ViT, ConvNeXt weights + confusion matrices
+│   ├── ensemble_config.json
+│   └── training_summary_report.txt
+└── production_deployment/       # Production config + deployment package
 ```
 
 ---
@@ -206,7 +234,8 @@ Realistic short-term work:
 - [ ] Evaluate on real field photos (not just curated datasets) and report the accuracy gap
 - [ ] Add Grad-CAM visualizations so users can see which leaf regions influenced the prediction
 - [ ] Quantize models with ONNX to enable on-device (mobile) inference
-- [ ] Expand to additional regional diseases beyond the current 7 classes
+- [ ] Run confidence-calibration analysis (reliability diagrams, ECE) and re-tune the 0.95 routing threshold
+- [ ] Expand to additional regional diseases beyond the current 5
 
 ---
 
