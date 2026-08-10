@@ -82,11 +82,16 @@ if errorlevel 1 (
     goto :fail
 )
 
-REM Training images were tracked before .gitignore covered them. Untrack them
-REM if they are still in the index; a no-op once already done.
-git rm -r --cached train validation train_stage2 validation_stage2 -q >nul 2>&1
-
+REM ORDER MATTERS. An earlier version ran `git rm --cached` BEFORE `git add -A`,
+REM which un-staged the training images and then immediately staged them again
+REM - 5,347 files and 546MB straight back into the commit. The removal has to
+REM come AFTER the add.
+REM
+REM Doing it here rather than relying on .gitignore is deliberate: the ignore
+REM rule has been lost twice already when a checkout restored a branch's older
+REM copy of .gitignore. This does not care what .gitignore says.
 git add -A
+call :untrack_datasets
 git commit -m "%STAMP%" >nul 2>&1
 if errorlevel 1 (echo       nothing new to commit) else (echo       committed)
 
@@ -111,6 +116,7 @@ if errorlevel 1 (
     goto :restore
 )
 git add -A
+call :untrack_datasets
 git commit -m "Deploy %STAMP%" >nul 2>&1
 
 for /f %%c in ('git ls-files ^| find /c /v ""') do set "NFILES=%%c"
@@ -163,3 +169,11 @@ exit /b 0
 echo.
 pause
 exit /b 1
+
+REM ---------------------------------------------------------------------------
+REM Drop the training image sets from the index. 5,344 files, 884MB, read by
+REM nothing at runtime. Called after every `git add -A`, never before.
+REM ---------------------------------------------------------------------------
+:untrack_datasets
+git rm -r --cached train validation train_stage2 validation_stage2 -q >nul 2>&1
+exit /b 0

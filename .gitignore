@@ -29,6 +29,23 @@ test_images/
 *.tar
 *.tar.gz
 
+# ---------------------------------------------------------------------------
+# The original training/validation image sets — 5,344 files, 884MB.
+#
+# Committed long before this rule existed, so .gitignore never applied to them
+# and a plain `git add -A` puts every one of them straight back. This rule is a
+# second line of defence only: deploy.bat drops them from the index explicitly
+# after each `git add`, because this block has already been lost twice when a
+# checkout restored an older branch's copy of .gitignore.
+#
+# They are training inputs. Nothing at runtime reads them, and pushing them to
+# a Hugging Face Space gets the push rejected by its pre-receive hook.
+# ---------------------------------------------------------------------------
+train/
+validation/
+train_stage2/
+validation_stage2/
+
 # Local scratch / diagnostics
 bg_test/
 *.pdf
