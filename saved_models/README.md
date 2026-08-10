@@ -3,16 +3,26 @@
 ## Overview
 This is a two-stage ensemble deep learning system for rice leaf disease detection.
 
-### Stage 1: Initial Classification
-- **Purpose**: Classify leaves as Healthy, Bacterial Disease, or Non-leaf
-- **Models**: EfficientNet-B3, DenseNet-121, MobileNetV3-Large
-- **Method**: Soft voting ensemble (average predictions)
+> **Stale-doc warning (M-11, now corrected).** This file previously described a
+> 3-model Stage 2 including EfficientNetV2-S, and called Stage 2 "bacterial
+> disease classification". Production has used 2 models since November 2025, and
+> only one of the five diseases is bacterial. Corrected below.
 
-### Stage 2: Disease-Specific Classification
-- **Purpose**: Identify specific bacterial disease types
-- **Models**: ViT/EfficientNet-B4, ConvNeXt-Tiny/ResNeXt-50, EfficientNetV2-S/EfficientNet-B5
-- **Method**: Soft voting ensemble (average predictions)
-- **Trigger**: Only runs if Stage 1 detects bacterial disease
+### Stage 1: Initial Classification (7 classes)
+- **Purpose**: Classify into 5 diseases, healthy, or not-a-rice-leaf
+- **Models**: EfficientNet-B3, DenseNet-121, MobileNetV3-Large
+- **Method**: Weighted soft voting (members weighted by validation accuracy)
+
+### Stage 2: Disease Refinement (5 classes)
+- **Purpose**: Re-classify among the 5 disease classes
+- **Models**: ViT-Base, ConvNeXt-Tiny — **2 models**. EfficientNetV2-S was
+  dropped (94.09% standalone); removing it improved the ensemble by +0.91%.
+  Its checkpoints remain on disk but are not loaded by `app.py`.
+- **Method**: Weighted soft voting
+- **Trigger**: Stage 1 predicts **any disease** AND Stage 1 confidence < 0.95.
+  Four of the five diseases are fungal, not bacterial.
+- **Abstains**: if Stage 2 confidence < 0.45 the API returns `uncertain` rather
+  than forcing a disease label (M-13).
 
 ## Files Structure
 ```

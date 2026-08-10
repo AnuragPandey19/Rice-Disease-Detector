@@ -1,0 +1,78 @@
+# ---------------------------------------------------------------------------
+# Build context was measured at 3.8GB with no .dockerignore (AUDIT_BACKEND B-07).
+# Everything below is either not needed at runtime or actively harmful to
+# image size. Keep this file in sync with what the Dockerfile actually COPYs.
+# ---------------------------------------------------------------------------
+
+# v2 sandbox — must never enter an image
+v2/
+
+# Git history (1.8GB)
+.git/
+.gitattributes
+.gitignore
+
+# Datasets (884MB) — training data is not needed to serve
+train/
+train_stage2/
+validation/
+validation_stage2/
+
+# Notebooks and training artefacts
+*.ipynb
+.ipynb_checkpoints/
+model.ipynb
+
+# Node — only present for diagnostics/test_frontend.js (jsdom). 21MB, and the
+# runtime image has no Node in it at all.
+node_modules/
+package.json
+package-lock.json
+
+# Diagnostics and scratch
+bg_test/
+t1.webp
+t2.jpg
+t3.jpg
+
+# Docs — not needed in the runtime image. `*.md` covers all of them, including
+# README.md; Hugging Face reads that from the repo, not from the image.
+*.md
+*.docx
+*.pdf
+
+# Unused checkpoints.
+# app.py loads the NEWEST checkpoint per model. Everything below is dead weight.
+saved_models/v1_archive/
+saved_models/stage2_models/vit_base_20251115_122316.pth
+saved_models/stage2_models/convnext_tiny_20251115_124828.pth
+saved_models/stage2_models/efficientnetv2_s_*.pth
+
+# Training visualisations
+saved_models/**/*.png
+saved_models/*.pkl
+production_deployment/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# OS / editors
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Downloaded source datasets (inputs to v2/scripts/, never needed at runtime)
+PlantVillage-Dataset/
+paddy-doctor/
+paddydoc/
+train_images/
+test_images/
+*.zip
+
+_DELETE_ME/
+diagnostics/
+docs/

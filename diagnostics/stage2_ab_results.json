@@ -1,0 +1,108 @@
+{
+  "shipping": {
+    "t1.webp": {
+      "final": "leaf_blast",
+      "conf": 0.7256379316559849,
+      "s1": "leaf_blast",
+      "s1_conf": 0.698514734267921,
+      "s2_ran": true,
+      "s2": "leaf_blast",
+      "s2_conf": 0.7256379316559849,
+      "s2_probs": {
+        "bacterial_leaf_blight": 0.0006922425747464487,
+        "brown_spot": 0.27232393204753375,
+        "leaf_blast": 0.7256379316559849,
+        "leaf_scald": 0.00032119586951805075,
+        "narrow_brown_spot": 0.001024700070620163
+      },
+      "abstained": false
+    },
+    "t2.jpg": {
+      "final": "uncertain",
+      "conf": 0.39939045957628005,
+      "s1": "leaf_blast",
+      "s1_conf": 0.3837146974151481,
+      "s2_ran": true,
+      "s2": "leaf_blast",
+      "s2_conf": 0.39939045957628005,
+      "s2_probs": {
+        "bacterial_leaf_blight": 0.01998659091676137,
+        "brown_spot": 0.3139618233688425,
+        "leaf_blast": 0.39939045957628005,
+        "leaf_scald": 0.03189806381107287,
+        "narrow_brown_spot": 0.23476310576862228
+      },
+      "abstained": true
+    },
+    "t3.jpg": {
+      "final": "leaf_scald",
+      "conf": 0.5057875135561156,
+      "s1": "leaf_blast",
+      "s1_conf": 0.4095292795060095,
+      "s2_ran": true,
+      "s2": "leaf_scald",
+      "s2_conf": 0.5057875135561156,
+      "s2_probs": {
+        "bacterial_leaf_blight": 0.0006033316218317818,
+        "brown_spot": 0.08427099452477907,
+        "leaf_blast": 0.4084691651248743,
+        "leaf_scald": 0.5057875135561156,
+        "narrow_brown_spot": 0.0008689531822728538
+      },
+      "abstained": false
+    }
+  },
+  "candidate": {
+    "t1.webp": {
+      "final": "leaf_blast",
+      "conf": 0.7316834128888925,
+      "s1": "leaf_blast",
+      "s1_conf": 0.698514734267921,
+      "s2_ran": true,
+      "s2": "leaf_blast",
+      "s2_conf": 0.7316834128888925,
+      "s2_probs": {
+        "bacterial_leaf_blight": 0.04531189178368707,
+        "brown_spot": 0.22174523927663498,
+        "leaf_blast": 0.7316834128888925,
+        "leaf_scald": 0.0007793964494449301,
+        "narrow_brown_spot": 0.0004800215853234626
+      },
+      "abstained": false
+    },
+    "t2.jpg": {
+      "final": "leaf_blast",
+      "conf": 0.7827884711717303,
+      "s1": "leaf_blast",
+      "s1_conf": 0.3837146974151481,
+      "s2_ran": true,
+      "s2": "leaf_blast",
+      "s2_conf": 0.7827884711717303,
+      "s2_probs": {
+        "bacterial_leaf_blight": 0.011310286480317214,
+        "brown_spot": 0.2023750338563345,
+        "leaf_blast": 0.7827884711717303,
+        "leaf_scald": 0.0018961335253309636,
+        "narrow_brown_spot": 0.0016301043500775414
+      },
+      "abstained": false
+    },
+    "t3.jpg": {
+      "final": "leaf_scald",
+      "conf": 0.49157149350284635,
+      "s1": "leaf_blast",
+      "s1_conf": 0.4095292795060095,
+      "s2_ran": true,
+      "s2": "leaf_scald",
+      "s2_conf": 0.49157149350284635,
+      "s2_probs": {
+        "bacterial_leaf_blight": 0.0050951111886678325,
+        "brown_spot": 0.12066915338242747,
+        "leaf_blast": 0.37437523049967625,
+        "leaf_scald": 0.49157149350284635,
+        "narrow_brown_spot": 0.008289032612220013
+      },
+      "abstained": false
+    }
+  }
+}

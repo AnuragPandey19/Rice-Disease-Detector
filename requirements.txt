@@ -1,6 +1,10 @@
 Flask==3.0.0
-flask-cors
+flask-cors==4.0.0
 torch==2.5.1
 torchvision==0.20.1
-Pillow==10.0.0
+Pillow==10.4.0
 gunicorn==21.2.0
+# B-13: numpy was unpinned and arrived transitively. A 1.x/2.x resolution
+# difference between the build that worked and a later rebuild is a plausible
+# source of silent drift. torch 2.5.1 supports numpy 2.x.
+numpy==2.1.3

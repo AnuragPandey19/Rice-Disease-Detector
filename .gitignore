@@ -1,0 +1,88 @@
+# ---------------------------------------------------------------------------
+# v2 SANDBOX — never commit, never deploy.
+#
+# v2/ is an isolated experiment: a full copy of the dataset plus a retrain
+# with hard negatives, kept completely separate from the shipping project.
+# It must not reach GitHub or Hugging Face Spaces. If the experiment works we
+# promote it deliberately; if it does not, we delete the directory and nothing
+# in the live project was ever touched.
+#
+# To promote v2 later: copy the specific files you want into the root, do NOT
+# remove this ignore rule.
+# ---------------------------------------------------------------------------
+v2/
+
+# ---------------------------------------------------------------------------
+# Downloaded source datasets.
+#
+# git-push.bat runs `git add .`, so without these rules a finished PlantVillage
+# clone (~54,000 images) or an extracted Paddy Doctor archive would be committed
+# straight into the repo. Neither belongs in version control - they are inputs
+# to v2/scripts/, and v2/ itself is already ignored.
+# ---------------------------------------------------------------------------
+PlantVillage-Dataset/
+paddy-doctor/
+paddydoc/
+train_images/
+test_images/
+*.zip
+*.tar
+*.tar.gz
+
+# Local scratch / diagnostics
+bg_test/
+*.pdf
+diagnose_output.txt
+
+# Test images (now under diagnostics/images/).
+#
+# Excluded for LICENSING, not size - t2.jpg carries a visible Science Photo
+# Library watermark and t1/t3 are of unclear provenance. They are the evidence
+# behind the post-mortem, so they are kept locally and referenced in the docs,
+# but not redistributed. Anyone reproducing the work should substitute their own
+# field photographs; v2/scripts/06_test_real_photos.py accepts any images placed
+# in diagnostics/images/.
+t1.webp
+t2.jpg
+t3.jpg
+
+# Node — only present because diagnostics/test_frontend.js needs jsdom.
+# package.json and package-lock.json ARE committed so the test is reproducible;
+# the 1,840 installed files are not. git-push.bat runs `git add .`, so without
+# this rule they go straight into the repo (audit finding A-10).
+node_modules/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+.Python
+
+# Jupyter
+.ipynb_checkpoints/
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editors
+.vscode/
+.idea/
+*.swp
+
+# Logs
+*.log
+
+# Quarantined for manual deletion (sandbox could not rm)
+_DELETE_ME/
+
+# ---------------------------------------------------------------------------
+# Superseded v1 weights: 778MB of Stage 1 checkpoints and unused Stage 2
+# duplicates, kept locally for comparison but not worth a Git LFS quota that is
+# 1GB on the free tier. The live model is in saved_models/stage1_models/.
+# ---------------------------------------------------------------------------
+saved_models/v1_archive/

@@ -1,0 +1,38 @@
+[
+  {
+    "image": "t1.webp",
+    "diagnosis": "Leaf Blast",
+    "raw_class": "leaf_blast",
+    "confidence": 72.56,
+    "stage1": "leaf_blast",
+    "stage1_conf": 69.85,
+    "stage2_used": true,
+    "stage2": "leaf_blast",
+    "stage2_conf": 72.56,
+    "abstained": false
+  },
+  {
+    "image": "t2.jpg",
+    "diagnosis": "Uncertain",
+    "raw_class": "uncertain",
+    "confidence": 39.94,
+    "stage1": "leaf_blast",
+    "stage1_conf": 38.37,
+    "stage2_used": true,
+    "stage2": "leaf_blast",
+    "stage2_conf": 39.94,
+    "abstained": true
+  },
+  {
+    "image": "t3.jpg",
+    "diagnosis": "Leaf Scald",
+    "raw_class": "leaf_scald",
+    "confidence": 50.58,
+    "stage1": "leaf_blast",
+    "stage1_conf": 40.95,
+    "stage2_used": true,
+    "stage2": "leaf_scald",
+    "stage2_conf": 50.58,
+    "abstained": false
+  }
+]

@@ -20,14 +20,18 @@ This guide will walk you through deploying your Rice Leaf Disease Detection appl
 1. **Locate your trained models** from Jupyter notebook:
    ```
    saved_models/
-   ├── stage1_models/
-   │   ├── efficientnet_b3_20251115_104218.pth
-   │   ├── densenet121_20251115_110746.pth
-   │   └── mobilenetv3_20251115_113045.pth
-   └── stage2_models/
-       ├── vit_base_20251116_002651.pth
-       └── convnext_tiny_20251116_004720.pth
+   ├── stage1_models/          # v2, retrained Aug 2026
+   │   ├── efficientnet_b3_20260809_202820.pth
+   │   ├── densenet121_20260809_202820.pth
+   │   └── mobilenetv3_20260809_202820.pth
+   └── stage2_models/          # v2, retrained 2026-08-10
+       ├── vit_base_20260810_050916.pth
+       └── convnext_tiny_20260810_050916.pth
    ```
+
+   Only these five files are needed. `saved_models/v1_archive/` holds the
+   superseded Stage 1 weights and old Stage 2 duplicates; it is excluded from
+   the Docker image and does not need uploading.
 
 2. **Copy these files** to your project folder maintaining the structure
 

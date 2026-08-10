@@ -3,271 +3,825 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🌾 Rice Leaf Disease Detection - AI-Powered Diagnosis</title>
+    <title>Rice Leaf AI — Disease Detection &amp; Management Guidance</title>
+
+    <!-- F-16: no description or share preview existed -->
+    <meta name="description" content="Photograph a rice leaf and get a preliminary disease diagnosis from a two-stage deep-learning ensemble, with symptoms, cultural control, treatment options and links to IRRI fact sheets.">
+    <meta property="og:title" content="Rice Leaf AI — Disease Detection">
+    <meta property="og:description" content="Two-stage deep-learning ensemble for rice leaf disease diagnosis, with management guidance. Open source, free to use.">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary">
+    <meta name="theme-color" content="#15803d" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#0b1310" media="(prefers-color-scheme: dark)">
+
+    <!-- F-15: browser requested /favicon.ico and got a 404 on every load.
+         Inline SVG data URI avoids an extra request entirely. -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>%F0%9F%8C%BE</text></svg>">
+
+    <!-- F-09: Google Fonts removed. It added an external request on every load,
+         sent user IPs to Google, and fell back to system fonts anyway when
+         blocked. The stack in style.css is what Inter fell back to. -->
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <!--
+      Theme applied before first paint. If this ran in script.js at the bottom
+      of the body, a user with dark mode saved would get a white flash on every
+      navigation while the stylesheet painted light first. It has to be inline
+      and it has to be here.
+    -->
+    <script>
+        (function () {
+            try {
+                var saved = localStorage.getItem('theme');
+                if (saved === 'dark' || saved === 'light') {
+                    document.documentElement.setAttribute('data-theme', saved);
+                }
+            } catch (e) { /* private mode: fall through to the OS preference */ }
+        })();
+    </script>
 </head>
 <body>
-    <!-- Background Animation -->
-    <div class="background-animation"></div>
-    
-    <!-- Header -->
+    <a class="skip-link" href="#main">Skip to content</a>
+
     <header class="header">
         <div class="container">
-            <div class="logo">
-                <span class="logo-icon">🌾</span>
+            <a class="logo" href="#home">
+                <span class="logo-mark" aria-hidden="true">🌾</span>
                 <span class="logo-text">Rice Leaf AI</span>
-            </div>
-            <nav class="nav">
+            </a>
+
+            <nav class="nav" id="primaryNav" data-open="false" aria-label="Main navigation">
                 <a href="#home" class="nav-link active">Home</a>
+                <a href="#diagnose" class="nav-link">Diagnose</a>
+                <a href="#library" class="nav-link">Disease library</a>
+                <a href="#how-it-works" class="nav-link">How it works</a>
                 <a href="#about" class="nav-link">About</a>
-                <a href="#how-it-works" class="nav-link">How It Works</a>
             </nav>
+
+            <div class="header-actions">
+                <button class="theme-toggle" id="themeToggle" type="button"
+                        aria-label="Switch to dark theme">
+                    <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                         stroke-width="2" stroke-linecap="round" aria-hidden="true">
+                        <circle cx="12" cy="12" r="4"></circle>
+                        <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path>
+                    </svg>
+                    <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                         stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"></path>
+                    </svg>
+                </button>
+
+                <button class="nav-toggle" id="navToggle" type="button"
+                        aria-expanded="false" aria-controls="primaryNav" aria-label="Open menu">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                         stroke-width="2" stroke-linecap="round" aria-hidden="true">
+                        <path d="M3 6h18M3 12h18M3 18h18"></path>
+                    </svg>
+                </button>
+            </div>
         </div>
     </header>
 
-    <!-- Main Content -->
-    <main class="main-content">
-        <div class="container">
-            <!-- Hero Section -->
-            <section class="hero" id="home">
-                <div class="hero-content">
-                    <h1 class="hero-title">
-                        AI-Powered Rice Leaf
-                        <span class="gradient-text">Disease Detection</span>
-                    </h1>
-                    <p class="hero-subtitle">
-                        Upload an image of a rice leaf and get instant, accurate disease diagnosis using advanced deep learning models.
-                    </p>
-                    <div class="hero-stats">
-                        <div class="stat">
-                            <div class="stat-value">98.2%</div>
-                            <div class="stat-label">Accuracy</div>
+    <main id="main">
+
+        <!-- ================= HERO ================= -->
+        <section class="hero" id="home">
+            <div class="container">
+                <div class="hero-grid">
+                    <div class="hero-content">
+                        <p class="hero-badge">
+                            <b>Free</b> No sign-up · Nothing stored
+                        </p>
+
+                        <h1 class="hero-title">
+                            Diagnose rice leaf disease,<br>
+                            <span class="accent">then know what to do next</span>
+                        </h1>
+
+                        <p class="hero-subtitle">
+                            Photograph a leaf and get a preliminary diagnosis from a five-model
+                            ensemble — with symptoms, field actions, treatment options and links
+                            to IRRI fact sheets.
+                        </p>
+
+                        <div class="hero-cta">
+                            <a class="btn btn-primary btn-lg" href="#diagnose">
+                                Analyse a leaf
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                     stroke-width="2" stroke-linecap="round" aria-hidden="true">
+                                    <path d="M5 12h14M12 5l7 7-7 7"/>
+                                </svg>
+                            </a>
+                            <a class="btn btn-secondary btn-lg" href="#library">Browse diseases</a>
                         </div>
-                        <div class="stat">
-                            <div class="stat-value">5</div>
-                            <div class="stat-label">AI Models</div>
+
+                        <!--
+                          F-01: this block once read "98.2% Accuracy", a figure that
+                          existed nowhere in the results.
+                          v3.1: "5 ensemble models" and "7 output classes" were counts
+                          only the author cared about. A grower wants to know what it
+                          covers and how far to trust it. Accuracy stays, because
+                          hiding it would be the dishonest simplification; the
+                          methodology behind it belongs in the README, not here.
+                        -->
+                        <div class="hero-stats">
+                            <div class="stat">
+                                <div class="stat-value">5</div>
+                                <div class="stat-label">Diseases detected<span class="stat-caveat">plus healthy leaves</span></div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-value">94.5%</div>
+                                <div class="stat-label">Accuracy on test images<span class="stat-caveat">82% on field photos</span></div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-value">~2s</div>
+                                <div class="stat-label">Per photo<span class="stat-caveat">no account needed</span></div>
+                            </div>
                         </div>
-                        <div class="stat">
-                            <div class="stat-value">&lt;2s</div>
-                            <div class="stat-label">Detection Time</div>
+
+                        <p class="hero-disclaimer">
+                            A triage aid, not a diagnosis. Always confirm before spending
+                            money on chemicals.
+                        </p>
+                    </div>
+
+                    <!-- Decorative. Drawn in CSS/SVG because this repository cannot
+                         redistribute stock photography (see .gitignore). -->
+                    <div class="hero-visual" aria-hidden="true">
+                        <div class="leaf-stage">
+                            <svg viewBox="0 0 200 200" fill="none" stroke="currentColor" stroke-width="3.2"
+                                 stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M100 178C100 178 34 132 34 78C34 44 62 22 100 22C138 22 166 44 166 78C166 132 100 178 100 178Z"
+                                      fill="currentColor" fill-opacity=".08"/>
+                                <path d="M100 178V30"/>
+                                <path d="M100 66L68 46M100 66l32-20M100 100L60 78M100 100l40-22M100 134l-34-20M100 134l34-20"/>
+                            </svg>
+                            <div class="scan-line"></div>
                         </div>
+                        <span class="hero-chip hero-chip--a"><span class="dot"></span> Leaf blast · 92%</span>
+                        <span class="hero-chip hero-chip--b"><span class="dot"></span> Uncertain · abstained</span>
                     </div>
                 </div>
-            </section>
+            </div>
+        </section>
 
-            <!-- Upload Section -->
-            <section class="upload-section">
-                <div class="upload-card">
-                    <div class="upload-header">
-                        <h2>Upload Rice Leaf Image</h2>
-                        <p>Drag & drop, browse, or use camera</p>
+        <!-- ================= DIAGNOSE ================= -->
+        <section class="section" id="diagnose">
+            <div class="container">
+                <div class="section-head section-head--center">
+                    <p class="eyebrow">Diagnose</p>
+                    <h2 class="section-title">Upload a rice leaf</h2>
+                    <p class="section-lede">
+                        Photograph, drag and drop, or use your camera. Nothing is stored — the
+                        image is classified and discarded.
+                    </p>
+                </div>
+
+                <!--
+                  F-03: the only hint here used to be "Supports: JPG, PNG (Max 10MB)".
+                  Nothing told the user what the model actually needs. Framing still
+                  matters — studio 96.5% vs field 81.7% — but since the Aug 2026
+                  retrain, field photos are no longer rejected outright.
+                -->
+                <section class="guidance-panel" aria-labelledby="guidance-heading">
+                    <h2 class="guidance-title" id="guidance-heading">
+                        <span aria-hidden="true">📸</span> How to photograph the leaf
+                    </h2>
+                    <div class="guidance-grid">
+                        <div class="guidance-item do">
+                            <span class="guidance-mark" aria-hidden="true">✓</span>
+                            <div>
+                                <strong>Do</strong>
+                                <ul>
+                                    <li>One leaf, laid flat on plain paper</li>
+                                    <li>Leaf fills most of the frame</li>
+                                    <li>Even, indirect light</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="guidance-item dont">
+                            <span class="guidance-mark" aria-hidden="true">✕</span>
+                            <div>
+                                <strong>Avoid</strong>
+                                <ul>
+                                    <li>The leaf small or far away in the frame</li>
+                                    <li>Hard shadows, glare, or motion blur</li>
+                                    <li>Backgrounds unrelated to a paddy field</li>
+                                </ul>
+                            </div>
+                        </div>
                     </div>
-                    
-                    <div class="upload-area" id="uploadArea">
-                        <input type="file" id="fileInput" accept="image/*" hidden>
+                    <p class="guidance-why">
+                        Field photographs work — the model was retrained on real paddy-field
+                        images. Accuracy is still higher on a leaf laid flat on plain paper
+                        (96.5%) than on a field photo (81.7%), so use plain paper when you can.
+                        If a photo is rejected, the crop tool usually fixes it.
+                    </p>
+                </section>
+
+                <div class="upload-card" style="margin-top:1.5rem">
+                    <div class="upload-header">
+                        <h2>Upload rice leaf image</h2>
+                        <p>Drag &amp; drop, browse, or use your camera</p>
+                    </div>
+
+                    <!-- F-05: was a plain <div> with a click handler — not focusable,
+                         not reachable by keyboard, no accessible name. -->
+                    <div class="upload-area" id="uploadArea"
+                         role="button" tabindex="0"
+                         aria-label="Upload a rice leaf image. Press Enter to browse for a file, or drag a file here.">
+                        <input type="file" id="fileInput" accept="image/jpeg,image/png,image/webp" hidden>
                         <div class="upload-content" id="uploadContent">
-                            <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
                                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
                             </svg>
                             <p class="upload-text">Drop your image here or <span class="upload-link">browse</span></p>
-                            <p class="upload-hint">Supports: JPG, PNG, JPEG (Max 10MB)</p>
-                            
-                            <!-- Camera Button -->
+                            <p class="upload-hint">JPG, PNG or WebP · up to 10MB</p>
+
                             <button class="camera-button" id="cameraButton" type="button">
-                                <svg class="camera-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <svg class="camera-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                                     <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
                                     <circle cx="12" cy="13" r="4"></circle>
                                 </svg>
-                                <span>Use Camera</span>
+                                <span>Use camera</span>
                             </button>
                         </div>
-                        <div class="image-preview" id="imagePreview" style="display: none;">
-                            <img id="previewImage" alt="Preview">
-                            <button class="remove-image" id="removeImage">✕</button>
+
+                        <div class="image-preview" id="imagePreview" hidden>
+                            <img id="previewImage" alt="Selected rice leaf image, awaiting analysis">
+                            <button class="remove-image" id="removeImage" type="button" aria-label="Remove selected image">✕</button>
                         </div>
                     </div>
-                    
-                    <button class="analyze-button" id="analyzeButton" disabled>
-                        <span class="button-text">Analyze Image</span>
-                        <svg class="button-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                            <path d="M5 12h14M12 5l7 7-7 7"/>
-                        </svg>
-                    </button>
-                </div>
-            </section>
 
-            <!-- Camera Modal -->
-            <div class="camera-modal" id="cameraModal" style="display: none;">
-                <div class="camera-modal-content">
-                    <div class="camera-header">
-                        <h3>Take Photo</h3>
-                        <button class="close-camera" id="closeCameraBtn">✕</button>
-                    </div>
-                    <div class="camera-container">
-                        <video id="cameraVideo" autoplay playsinline></video>
-                        <canvas id="cameraCanvas" style="display: none;"></canvas>
-                    </div>
-                    <div class="camera-controls">
-                        <button class="camera-control-btn" id="switchCameraBtn" title="Switch Camera">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M17 1l4 4-4 4"></path>
-                                <path d="M3 11V9a4 4 0 0 1 4-4h14"></path>
-                                <path d="M7 23l-4-4 4-4"></path>
-                                <path d="M21 13v2a4 4 0 0 1-4 4H3"></path>
+                    <div class="upload-actions">
+                        <!-- F-06: no way to remove background before submitting. Cropping a
+                             failing field photo down to the leaf changes the prediction from
+                             not_rice_leaf (99.08%) to the correct disease — see
+                             diagnostics/test_background.py. -->
+                        <button class="btn btn-secondary crop-button" id="cropButton" type="button" hidden>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                <path d="M6 2v14a2 2 0 0 0 2 2h14"></path>
+                                <path d="M18 22V8a2 2 0 0 0-2-2H2"></path>
                             </svg>
+                            <span>Crop to leaf</span>
                         </button>
-                        <button class="capture-btn" id="captureBtn">
-                            <div class="capture-btn-inner"></div>
-                        </button>
-                        <button class="camera-control-btn" id="cancelCameraBtn" title="Cancel">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <line x1="18" y1="6" x2="6" y2="18"></line>
-                                <line x1="6" y1="6" x2="18" y2="18"></line>
+
+                        <button class="btn btn-primary analyze-button" id="analyzeButton" type="button" disabled>
+                            <span class="button-text">Analyse image</span>
+                            <svg class="button-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                <path d="M5 12h14M12 5l7 7-7 7"/>
                             </svg>
                         </button>
                     </div>
                 </div>
-            </div>
 
-            <!-- Loading Overlay -->
-            <div class="loading-overlay" id="loadingOverlay" style="display: none;">
-                <div class="loading-content">
-                    <div class="loading-spinner"></div>
-                    <p class="loading-text">Analyzing image...</p>
-                    <p class="loading-subtext">Processing with AI models</p>
-                </div>
-            </div>
+                <!--
+                  F-05 required that a screen reader announce the diagnosis. v2 put
+                  aria-live on this whole section, which was fine when it held four
+                  lines. It now holds four tab panels of guidance, and a live region
+                  that large would read the entire thing aloud on every result.
+                  Instead: a concise status line below announces the outcome, and
+                  focus moves to the panel so the detail is there to explore.
+                -->
+                <p class="sr-only" id="resultStatus" role="status" aria-live="polite"></p>
 
-            <!-- Results Section -->
-            <section class="results-section" id="resultsSection" style="display: none;">
-                <div class="results-card">
-                    <div class="results-header">
-                        <h2>Analysis Results</h2>
-                        <button class="close-results" id="closeResults">✕</button>
-                    </div>
-                    
-                    <div class="diagnosis-banner" id="diagnosisBanner">
-                        <div class="diagnosis-icon" id="diagnosisIcon">🌿</div>
-                        <div class="diagnosis-content">
-                            <h3 class="diagnosis-title" id="diagnosisTitle">Diagnosis</h3>
-                            <div class="confidence-badge" id="confidenceBadge">
-                                <span class="confidence-label">Confidence:</span>
-                                <span class="confidence-value" id="confidenceValue">0%</span>
-                            </div>
+                <section class="results-section" id="resultsSection" hidden
+                         tabindex="-1" aria-labelledby="resultsHeading" style="margin-top:1.75rem">
+                    <div class="results-card">
+                        <div class="results-header">
+                            <h2 id="resultsHeading">Analysis results</h2>
+                            <button class="close-results" id="closeResults" type="button" aria-label="Close results">✕</button>
                         </div>
-                    </div>
-                    
-                    <div class="severity-indicator" id="severityIndicator">
-                        <span class="severity-label">Severity:</span>
-                        <span class="severity-badge" id="severityBadge">Unknown</span>
-                    </div>
-                    
-                    <div class="result-details">
-                        <div class="detail-section">
-                            <h4>📋 Description</h4>
-                            <p id="descriptionText">No description available</p>
-                        </div>
-                        
-                        <div class="detail-section">
-                            <h4>💡 Recommendation</h4>
-                            <p id="recommendationText">No recommendations available</p>
-                        </div>
-                        
-                        <div class="detail-section technical-details">
-                            <h4>🔬 Technical Details</h4>
-                            <div class="tech-grid">
-                                <div class="tech-item">
-                                    <span class="tech-label">Stage 1 Prediction:</span>
-                                    <span class="tech-value" id="stage1Pred">-</span>
-                                </div>
-                                <div class="tech-item">
-                                    <span class="tech-label">Stage 1 Confidence:</span>
-                                    <span class="tech-value" id="stage1Conf">-</span>
-                                </div>
-                                <div class="tech-item">
-                                    <span class="tech-label">Stage 2 Used:</span>
-                                    <span class="tech-value" id="stage2Used">-</span>
-                                </div>
-                                <div class="tech-item">
-                                    <span class="tech-label">Models Used:</span>
-                                    <span class="tech-value" id="modelsUsed">-</span>
+
+                        <div class="diagnosis-banner" id="diagnosisBanner">
+                            <div class="diagnosis-icon" id="diagnosisIcon" aria-hidden="true">🌿</div>
+                            <div class="diagnosis-content">
+                                <h3 class="diagnosis-title" id="diagnosisTitle">Diagnosis</h3>
+                                <div class="confidence-badge" id="confidenceBadge">
+                                    <span class="confidence-label">Confidence</span>
+                                    <span class="confidence-value" id="confidenceValue">0%</span>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    
-                    <button class="analyze-another" id="analyzeAnother">
-                        Analyze Another Image
-                    </button>
-                </div>
-            </section>
 
-            <!-- How It Works Section -->
-            <section class="how-it-works" id="how-it-works">
-                <h2 class="section-title">How It Works</h2>
+                        <div class="result-meta">
+                            <div class="severity-indicator" id="severityIndicator">
+                                <span class="severity-label">Severity</span>
+                                <span class="severity-badge" id="severityBadge">Unknown</span>
+                            </div>
+                            <div class="pathogen-indicator" id="pathogenIndicator" hidden>
+                                <span class="pathogen-label">Pathogen</span>
+                                <span class="pathogen-value" id="pathogenValue">—</span>
+                            </div>
+                        </div>
+
+                        <!--
+                          A-12 and A-02, both written for the reader rather than the
+                          author. v3.0 explained the cause — which stage disagreed with
+                          which, and that leaf scald had only studio training images.
+                          None of that changes what a grower should do. What changes it
+                          is "this one might be wrong, check it", so that is all these
+                          say now. The reasoning lives in AUDIT.md.
+                        -->
+                        <div class="result-notice" id="agreementNotice" hidden>
+                            <span class="notice-icon" aria-hidden="true">⚖️</span>
+                            <div>
+                                <strong>Not a confident result</strong>
+                                <p id="agreementText"></p>
+                            </div>
+                        </div>
+
+                        <div class="result-notice" id="reliabilityNotice" hidden>
+                            <span class="notice-icon" aria-hidden="true">🔬</span>
+                            <div>
+                                <strong>Check this one carefully</strong>
+                                <p id="reliabilityText"></p>
+                            </div>
+                        </div>
+
+                        <div class="rejection-help" id="rejectionHelp" hidden>
+                            <strong>Rejected as “not a rice leaf”?</strong>
+                            <p>
+                                Cropping tightly around a single leaf usually resolves this. The
+                                model handles paddy-field backgrounds, but very cluttered or
+                                unrelated scenes can still be rejected.
+                            </p>
+                            <button class="btn btn-secondary" id="rejectionCropBtn" type="button">Open crop tool</button>
+                        </div>
+
+                        <div class="care-tabs" id="careTabs">
+                            <div class="tablist" role="tablist" aria-label="Guidance sections">
+                                <button class="tab" type="button" role="tab" id="tab-overview"
+                                        aria-controls="panel-overview" aria-selected="true">Overview</button>
+                                <button class="tab" type="button" role="tab" id="tab-treat"
+                                        aria-controls="panel-treat" aria-selected="false" tabindex="-1">What to do</button>
+                                <button class="tab" type="button" role="tab" id="tab-prevent"
+                                        aria-controls="panel-prevent" aria-selected="false" tabindex="-1">Prevention</button>
+                                <button class="tab" type="button" role="tab" id="tab-help"
+                                        aria-controls="panel-help" aria-selected="false" tabindex="-1">Get help</button>
+                            </div>
+
+                            <div class="tabpanel" role="tabpanel" id="panel-overview"
+                                 aria-labelledby="tab-overview" tabindex="0">
+                                <p class="care-summary" id="careSummary">—</p>
+                                <dl class="fact-row" id="factRow" hidden></dl>
+                                <h4><span aria-hidden="true">📋</span> Description</h4>
+                                <p id="descriptionText">No description available</p>
+                                <div id="symptomsBlock" hidden>
+                                    <h4><span aria-hidden="true">🔎</span> What to look for</h4>
+                                    <ul class="care-list" id="symptomsList"></ul>
+                                </div>
+                            </div>
+
+                            <div class="tabpanel" role="tabpanel" id="panel-treat"
+                                 aria-labelledby="tab-treat" tabindex="0" hidden>
+                                <h4><span aria-hidden="true">💡</span> Summary</h4>
+                                <p id="recommendationText">No recommendations available</p>
+                                <div id="firstStepsBlock" hidden>
+                                    <h4><span aria-hidden="true">⚡</span> Do this first</h4>
+                                    <ol class="care-list care-list--numbered" id="firstStepsList"></ol>
+                                </div>
+                                <div id="culturalBlock" hidden>
+                                    <h4><span aria-hidden="true">🌱</span> Cultural control</h4>
+                                    <ul class="care-list" id="culturalList"></ul>
+                                </div>
+                                <div id="chemBlock" hidden>
+                                    <h4><span aria-hidden="true">🧪</span> Chemical options</h4>
+                                    <div class="chem-actives" id="chemActives"></div>
+                                    <div class="chem-caution">
+                                        <span class="notice-icon" aria-hidden="true">⚠️</span>
+                                        <span id="chemCaution"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="tabpanel" role="tabpanel" id="panel-prevent"
+                                 aria-labelledby="tab-prevent" tabindex="0" hidden>
+                                <div id="preventionBlock" hidden>
+                                    <h4><span aria-hidden="true">🛡️</span> Next season</h4>
+                                    <ul class="care-list" id="preventionList"></ul>
+                                </div>
+                                <div class="escalate-box" id="escalateBox" hidden>
+                                    <span class="notice-icon" aria-hidden="true">🚩</span>
+                                    <div>
+                                        <strong>Call someone when…</strong>
+                                        <p id="escalateText"></p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="tabpanel" role="tabpanel" id="panel-help"
+                                 aria-labelledby="tab-help" tabindex="0" hidden>
+                                <div id="linksBlock" hidden>
+                                    <h4><span aria-hidden="true">📚</span> Fact sheets</h4>
+                                    <div class="link-list" id="linkList"></div>
+                                </div>
+                                <div id="helplineBlock" hidden>
+                                    <h4><span aria-hidden="true">☎️</span> Talk to a person</h4>
+                                    <div id="helplineList"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <p class="result-disclaimer">
+                            <strong>This is a triage aid, not a diagnosis.</strong> Confirm with an
+                            agronomist before spending on chemicals. Spray rates are left out on
+                            purpose — the right rate depends on the product and what is approved
+                            where you farm.
+                        </p>
+
+                        <!--
+                          v3.0 showed a seven-field panel here: both stage predictions,
+                          both confidences, whether stage 2 ran, the runner-up, and the
+                          model count. That is instrumentation. It told a grower nothing
+                          they could act on, and the one genuinely useful signal in it —
+                          a close second place — is now stated in plain words above.
+                          What survives is the reference, because it is the only thing
+                          needed to report a bad result.
+                        -->
+                        <p class="result-ref">
+                            Reference <span id="requestRef">—</span> · quote this if you report a wrong result
+                        </p>
+
+                        <div class="results-footer">
+                            <button class="btn btn-ghost btn-block" id="analyzeAnother" type="button">
+                                Analyse another image
+                            </button>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </section>
+
+        <!-- ================= HOW IT WORKS ================= -->
+        <section class="section section--alt" id="how-it-works">
+            <div class="container">
+                <div class="section-head section-head--center">
+                    <p class="eyebrow">Process</p>
+                    <h2 class="section-title">How it works</h2>
+                    <p class="section-lede">
+                        Three models triage every image. Two more are called in only when the
+                        first three are unsure.
+                    </p>
+                </div>
+
                 <div class="steps-grid">
                     <div class="step-card">
-                        <div class="step-number">1</div>
-                        <h3>Upload Image</h3>
-                        <p>Upload a clear photo of a rice leaf</p>
+                        <span class="step-number" aria-hidden="true">01</span>
+                        <div class="step-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+                            </svg>
+                        </div>
+                        <h3>Upload a leaf</h3>
+                        <p>One leaf, flat on plain paper, filling the frame. Field photos work too.</p>
                     </div>
                     <div class="step-card">
-                        <div class="step-number">2</div>
-                        <h3>AI Analysis</h3>
-                        <p>5 AI models analyze the leaf in 2 stages</p>
+                        <span class="step-number" aria-hidden="true">02</span>
+                        <div class="step-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                                <circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/>
+                            </svg>
+                        </div>
+                        <h3>Two-stage analysis</h3>
+                        <p>Three models sort across 7 classes; two transformers refine uncertain disease cases.</p>
                     </div>
                     <div class="step-card">
-                        <div class="step-number">3</div>
-                        <h3>Get Results</h3>
-                        <p>Receive diagnosis with recommendations</p>
+                        <span class="step-number" aria-hidden="true">03</span>
+                        <div class="step-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+                            </svg>
+                        </div>
+                        <h3>Act on it</h3>
+                        <p>Symptoms, field actions, treatment options, prevention, and who to call.</p>
                     </div>
                 </div>
-            </section>
+            </div>
+        </section>
 
-            <!-- About Section -->
-            <section class="about-section" id="about">
-                <div class="about-content">
-                    <h2 class="section-title">About This System</h2>
-                    <p class="about-text">
-                        This AI-powered system uses a two-stage ensemble approach with 5 deep learning models 
-                        to accurately detect rice leaf diseases. It can identify healthy leaves, non-rice leaves, 
-                        and 5 different bacterial diseases with 98.2% accuracy.
+        <!-- ================= DISEASE LIBRARY ================= -->
+        <section class="section" id="library">
+            <div class="container">
+                <div class="section-head section-head--center">
+                    <p class="eyebrow">Reference</p>
+                    <h2 class="section-title">Disease library</h2>
+                    <p class="section-lede">
+                        The five diseases this system recognises. Same guidance the analyser
+                        returns — browse it without uploading anything.
                     </p>
-                    <div class="features-grid">
-                        <div class="feature">
-                            <div class="feature-icon">🎯</div>
-                            <h3>High Accuracy</h3>
-                            <p>98.2% detection accuracy</p>
+                </div>
+
+                <div class="library-grid">
+                    {% for d in library | default([], true) %}
+                    <details class="disease-card">
+                        <summary>
+                            <span class="disease-emoji" aria-hidden="true">{{ d.icon }}</span>
+                            <span class="disease-head">
+                                <span class="disease-name">{{ d.name }}</span>
+                                <span class="disease-pathogen">{{ d.pathogen }}</span>
+                            </span>
+                            <svg class="disease-chevron" viewBox="0 0 24 24" width="18" height="18"
+                                 fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                <path d="M6 9l6 6 6-6"/>
+                            </svg>
+                        </summary>
+
+                        <div class="disease-tags">
+                            <span class="tag tag--{{ d.severity | lower }}">{{ d.severity }} severity</span>
+                            {% if d.care and d.care.reliability_note %}
+                            <span class="tag tag--caution">Studio-only data</span>
+                            {% endif %}
                         </div>
-                        <div class="feature">
-                            <div class="feature-icon">⚡</div>
-                            <h3>Fast Processing</h3>
-                            <p>Results in under 2 seconds</p>
+
+                        <div class="disease-body">
+                            {% if d.care and d.care.summary %}
+                            <p>{{ d.care.summary }}</p>
+                            {% endif %}
+
+                            {% if d.care and d.care.symptoms %}
+                            <h4>What to look for</h4>
+                            <ul class="care-list">
+                                {% for s in d.care.symptoms %}<li>{{ s }}</li>{% endfor %}
+                            </ul>
+                            {% endif %}
+
+                            {% if d.care and d.care.first_steps %}
+                            <h4>Do this first</h4>
+                            <ol class="care-list care-list--numbered">
+                                {% for s in d.care.first_steps %}<li>{{ s }}</li>{% endfor %}
+                            </ol>
+                            {% endif %}
+
+                            {% if d.care and d.care.reliability_note %}
+                            <h4>Reliability</h4>
+                            <p>{{ d.care.reliability_note }}</p>
+                            {% endif %}
+
+                            {% if d.care and d.care.links %}
+                            <div class="link-list">
+                                {% for l in d.care.links %}
+                                <a href="{{ l.url }}" target="_blank" rel="noopener">{{ l.label }}</a>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
                         </div>
-                        <div class="feature">
-                            <div class="feature-icon">🧠</div>
-                            <h3>Smart System</h3>
-                            <p>2-stage verification process</p>
+                    </details>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= ABOUT ================= -->
+        <section class="section section--alt" id="about">
+            <div class="container">
+                <div class="about-grid">
+                    <div>
+                        <p class="eyebrow">About</p>
+                        <h2 class="section-title">Built, broken, and rebuilt</h2>
+
+                        <!-- F-02: previously "5 different bacterial diseases". Only
+                             bacterial_leaf_blight is bacterial; the other four are fungal. -->
+                        <p class="about-text">
+                            A two-stage ensemble of five deep-learning models classifies rice leaf
+                            images into seven categories: healthy, not-a-rice-leaf, and five common
+                            diseases — one bacterial (bacterial leaf blight) and four fungal
+                            (brown spot, leaf blast, leaf scald, narrow brown spot).
+                        </p>
+                        <p class="about-text">
+                            The first version scored 96.68% and was wrong about why. It had learned
+                            that a leaf on plain paper meant “rice” and a busy background meant
+                            “not rice” — so real field photographs were rejected outright. Both
+                            stages were retrained on a rebuilt dataset with hard negatives and 800
+                            real paddy-field images.
+                        </p>
+                        <p class="about-text about-caveat">
+                            <strong>Scope and limits.</strong> It is a triage aid, not a substitute
+                            for an agronomist. Leaf scald and narrow brown spot remain studio-only
+                            in the training data, so treat those two results with extra caution. It
+                            does not cover nutrient deficiencies, pest damage, or the other 15-plus
+                            rice diseases, and it cannot say “something else”.
+                        </p>
+
+                        <div class="metric-strip">
+                            <div class="metric">
+                                <div class="metric-value">94.51%</div>
+                                <div class="metric-label">Stage 1 test</div>
+                            </div>
+                            <div class="metric">
+                                <div class="metric-value">95.29%</div>
+                                <div class="metric-label">Stage 2 test</div>
+                            </div>
+                            <div class="metric">
+                                <div class="metric-value">0</div>
+                                <div class="metric-label">False rejections / 656</div>
+                            </div>
                         </div>
-                        <div class="feature">
-                            <div class="feature-icon">📱</div>
-                            <h3>Easy to Use</h3>
-                            <p>Simple drag & drop interface</p>
+                    </div>
+
+                    <div>
+                        <div class="features-grid">
+                            <div class="feature">
+                                <div class="feature-icon" aria-hidden="true">🎯</div>
+                                <h3>Two-stage design</h3>
+                                <p>Fast triage, then refinement only when uncertain</p>
+                            </div>
+                            <div class="feature">
+                                <div class="feature-icon" aria-hidden="true">🧠</div>
+                                <h3>5-model ensemble</h3>
+                                <p>CNN and transformer backbones voting together</p>
+                            </div>
+                            <div class="feature">
+                                <div class="feature-icon" aria-hidden="true">🔍</div>
+                                <h3>Abstains when unsure</h3>
+                                <p>Returns “uncertain” rather than guessing a disease</p>
+                            </div>
+                            <div class="feature">
+                                <div class="feature-icon" aria-hidden="true">⚖️</div>
+                                <h3>Flags disagreement</h3>
+                                <p>Says so when the two stages pick different diseases</p>
+                            </div>
+                            <div class="feature">
+                                <div class="feature-icon" aria-hidden="true">📱</div>
+                                <h3>Works on mobile</h3>
+                                <p>Camera capture with a square framing guide</p>
+                            </div>
+                            <div class="feature">
+                                <div class="feature-icon" aria-hidden="true">🔒</div>
+                                <h3>Nothing stored</h3>
+                                <p>Images are classified in memory and discarded</p>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </section>
-        </div>
+
+                <div class="team">
+                    <div class="section-head section-head--center">
+                        <p class="eyebrow">Team</p>
+                        <h2 class="section-title">Who built this</h2>
+                    </div>
+
+                    <ul class="team-grid">
+                        <li class="person">
+                            <span class="person-avatar" aria-hidden="true">AP</span>
+                            <h3 class="person-name">Anurag Pandey</h3>
+                            <p class="person-role">Architecture &amp; engineering</p>
+                            <p class="person-detail">
+                                Two-stage ensemble design, training pipeline, evaluation and
+                                audit, web application and deployment.
+                            </p>
+                        </li>
+                        <li class="person">
+                            <span class="person-avatar" aria-hidden="true">K</span>
+                            <h3 class="person-name">Kanika</h3>
+                            <p class="person-role">Data &amp; baseline model</p>
+                            <p class="person-detail">
+                                Dataset assembly, preprocessing and feature engineering, and
+                                the baseline classifier the ensemble was measured against.
+                            </p>
+                        </li>
+                        <li class="person">
+                            <span class="person-avatar" aria-hidden="true">T</span>
+                            <h3 class="person-name">Tulip</h3>
+                            <p class="person-role">Research</p>
+                            <p class="person-detail">
+                                Literature review, disease reference material, and the
+                                agronomic sources behind the management guidance.
+                            </p>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
     </main>
 
-    <!-- Footer -->
+    <!-- ================= MODALS ================= -->
+
+    <!-- Crop modal (F-06) -->
+    <div class="modal crop-modal" id="cropModal" hidden
+         role="dialog" aria-modal="true" aria-labelledby="cropTitle">
+        <div class="modal-content crop-modal-content">
+            <div class="modal-header">
+                <h3 id="cropTitle">Crop to the leaf</h3>
+                <button class="modal-close" id="closeCropBtn" type="button" aria-label="Close crop tool">✕</button>
+            </div>
+            <p class="crop-hint">
+                Drag to select the leaf. Trimming away background usually turns a
+                rejected photo into a correct diagnosis.
+            </p>
+            <div class="crop-stage" id="cropStage">
+                <canvas id="cropCanvas"></canvas>
+                <div class="crop-selection" id="cropSelection" hidden></div>
+            </div>
+            <div class="modal-controls">
+                <button class="btn btn-secondary" id="cropResetBtn" type="button">Reset</button>
+                <button class="btn btn-primary" id="cropApplyBtn" type="button">Apply crop</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Camera modal -->
+    <div class="modal camera-modal" id="cameraModal" hidden
+         role="dialog" aria-modal="true" aria-labelledby="cameraTitle">
+        <div class="modal-content camera-modal-content">
+            <div class="modal-header">
+                <h3 id="cameraTitle">Take photo</h3>
+                <button class="modal-close" id="closeCameraBtn" type="button" aria-label="Close camera">✕</button>
+            </div>
+            <div class="camera-container">
+                <video id="cameraVideo" autoplay playsinline muted></video>
+                <!-- F-12: square framing guide. Capture is cropped to this square,
+                     matching the 1:1 training images instead of a 16:9 scene. -->
+                <div class="camera-guide" aria-hidden="true"></div>
+                <canvas id="cameraCanvas" hidden></canvas>
+            </div>
+            <p class="camera-hint" style="margin-top:.9rem">Fill the square with a single leaf on plain paper.</p>
+            <div class="camera-controls">
+                <button class="camera-control-btn" id="switchCameraBtn" type="button" aria-label="Switch between front and rear camera">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <path d="M17 1l4 4-4 4"></path>
+                        <path d="M3 11V9a4 4 0 0 1 4-4h14"></path>
+                        <path d="M7 23l-4-4 4-4"></path>
+                        <path d="M21 13v2a4 4 0 0 1-4 4H3"></path>
+                    </svg>
+                </button>
+                <button class="capture-btn" id="captureBtn" type="button" aria-label="Capture photo">
+                    <div class="capture-btn-inner"></div>
+                </button>
+                <button class="camera-control-btn" id="cancelCameraBtn" type="button" aria-label="Cancel and close camera">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="loading-overlay" id="loadingOverlay" hidden>
+        <div class="loading-content">
+            <div class="loading-spinner" aria-hidden="true"></div>
+            <p class="loading-text">Analysing image…</p>
+            <p class="loading-subtext">Running the ensemble</p>
+        </div>
+    </div>
+
+    <!-- ================= FOOTER ================= -->
     <footer class="footer">
         <div class="container">
-            <p>&copy; 2025 Rice Leaf Disease Detection. Powered by Deep Learning.</p>
-            <p class="footer-tech">Built with PyTorch, Flask & Modern AI</p>
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <span class="logo">
+                        <span class="logo-mark" aria-hidden="true">🌾</span>
+                        <span class="logo-text">Rice Leaf AI</span>
+                    </span>
+                    <p class="footer-about">
+                        An open-source triage aid for rice leaf disease. Built as a study in
+                        finding, measuring and reporting a model's real failure modes rather
+                        than its best number.
+                    </p>
+                </div>
+
+                <div class="footer-col">
+                    <h4>Site</h4>
+                    <ul>
+                        <li><a href="#diagnose">Diagnose</a></li>
+                        <li><a href="#library">Disease library</a></li>
+                        <li><a href="#how-it-works">How it works</a></li>
+                        <li><a href="#about">About</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-col">
+                    <h4>References</h4>
+                    <ul>
+                        {% for r in (support.references if support else []) %}
+                        <li><a href="{{ r.url }}" target="_blank" rel="noopener">{{ r.label }}</a></li>
+                        {% endfor %}
+                    </ul>
+                </div>
+
+                <div class="footer-col">
+                    <h4>Help</h4>
+                    <ul>
+                        {% for h in (support.helplines if support else []) %}
+                        <li><span><strong>{{ h.name }}</strong><br>{{ h.contact }}</span></li>
+                        {% endfor %}
+                        <li><a href="https://github.com/AnuragPandey19/Rice-Disease-Detector" target="_blank" rel="noopener">Source code</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <!-- F-19: year was hardcoded to 2025; script.js now fills it -->
+                <p>&copy; <span id="footerYear">2026</span> Rice Leaf Disease Detection · MIT licence</p>
+                <p>Built with PyTorch and Flask · Fact sheets © IRRI, CC BY-NC-SA</p>
+            </div>
         </div>
     </footer>
+
+    <div class="toast-container" id="toastContainer" role="status" aria-live="polite"></div>
 
     <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
